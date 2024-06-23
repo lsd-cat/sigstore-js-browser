@@ -1,0 +1,18 @@
+{
+  "name": "vite-sigstore",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "test": "vitest"
+  },
+  "devDependencies": {
+    "typescript": "^5.2.2",
+    "vite": "^5.3.1",
+    "vite-plugin-singlefile": "^2.0.2",
+    "vitest": "^1.6.0"
+  }
+}
