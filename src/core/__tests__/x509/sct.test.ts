@@ -109,26 +109,24 @@ describe('SignedCertificateTimestamp', () => {
     let key: CryptoKey;
     crypto.createPublicKey(
       base64ToUint8Array(
-        'MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEbfwR+RJudXscgRBRpKX1XFDy3PyudDxz/SfnRi1fT8ekpfBd2O1uoz7jr3Z8nKzxA69EUQ+eFCFI3zeubPWU7w=='      )
+        'MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEbfwR+RJudXscgRBRpKX1XFDy3PyudDxz/SfnRi1fT8ekpfBd2O1uoz7jr3Z8nKzxA69EUQ+eFCFI3zeubPWU7w==')
     ).then(result => {
       key = result;
     });
 
-    describe('when the signature is valid', () => {
-      it('returns true', () => {
-        subject.verify(preCert, key).then(result => {
-          expect(result).toEqual(true);
-        })
+    describe('when the signature is valid', async () => {
+      it('returns true', async () => {
+        const res1 = await subject.verify(preCert, key);
+        expect(res1).toEqual(true);
       });
     });
 
-    describe('when the signature is invalid', () => {
+    describe('when the signature is invalid', async () => {
       const preCert = hexToUint8Array('deadbeaf');
 
-      it('returns false', () => {
-        subject.verify(preCert, key).then(result => {
-          expect(result).toEqual(false);
-        });
+      it('returns false', async () => {
+        const res1 = await subject.verify(preCert, key);
+        expect(res1).toEqual(false);
       });
     });
   });

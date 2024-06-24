@@ -13,10 +13,12 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-import { stringToUint8Array } from './encoding';
+import { base64ToUint8Array, hexToUint8Array, stringToUint8Array } from './encoding';
 import { toDER } from './pem';
 import { ASN1Obj } from './asn1/obj';
 import { ECDSA_CURVE_NAMES } from './oid';
+
+import { uint8ArrayToBase64 } from './encoding';
 
 type KeyLike = string | Uint8Array;
 const SHA256_ALGORITHM = 'sha256';
@@ -106,8 +108,7 @@ export async function verify(
   signature: Uint8Array,
   algorithm?: string
 ): Promise<boolean> {
-  // The try/catch is to work around an issue in Node 14.x where verify throws
-  // an error in some scenarios if the signature is invalid.
+
   let options: EcdsaParams;
 
   // Default to sha256
@@ -120,9 +121,23 @@ export async function verify(
     hash = "SHA-384";
   }
 
-  options = {name: 'ECDSA', hash: hash}
-  crypto.subtle.verify(options, key, signature, data);
-  return false;
+  // For posterity: this mess is because the web crypto API supports only
+  // IEEE P1363, so we etract r and s from the DER sig and manually ancode
+  // big endian and append them one after each other
+
+  options = {name: 'ECDSA', hash: {name: hash}}
+  const asn1_sig = ASN1Obj.parseBuffer(signature);
+  let r = asn1_sig.subs[0].toInteger();
+  let s = asn1_sig.subs[1].toInteger();
+
+  const binr = hexToUint8Array(r.toString(16));
+  const bins = hexToUint8Array(s.toString(16));
+
+  let raw_signature = new Uint8Array(binr.length + bins.length);
+  raw_signature.set(binr, 0);
+  raw_signature.set(bins, binr.length);
+
+  return await crypto.subtle.verify(options, key, raw_signature, data);
 }
 
 // We can make this timesafe, but we are using it only to verify at this point :)

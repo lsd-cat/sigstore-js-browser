@@ -82,7 +82,7 @@ describe('RFC3161Timestamp', () => {
       const data = artifact;
 
       it('does not throw an error', () => {
-        expect(async () => await subject.verify(data, key)).rejects.not.toThrow();
+        expect(async () => await subject.verify(data, key)).not.toThrow();
       });
     });
 

@@ -15,7 +15,7 @@ limitations under the License.
 */
 import { X509Certificate } from '../../x509/cert';
 import { certificates } from '../__fixtures__/certs';
-import { base64ToUint8Array, hexToUint8Array } from '../../encoding';
+import { hexToUint8Array } from '../../encoding';
 
 
 describe('X509Certificate', () => {
